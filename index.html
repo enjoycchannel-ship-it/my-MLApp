@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deep Ocean AI Detector</title>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;500&family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --ocean-dark: #001219;
+            --ocean-deep: #005f73;
+            --ocean-mid: #0a9396;
+            --ocean-light: #94d2bd;
+            --sand: #e9d8a6;
+            --white: #ffffff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Kanit', 'Montserrat', sans-serif;
+            background: linear-gradient(180deg, var(--ocean-dark) 0%, #002233 100%);
+            color: var(--white);
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(0, 18, 25, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 1rem 0;
+            z-index: 1000;
+            border-bottom: 1px solid var(--ocean-deep);
+        }
+
+        nav ul {
+            display: flex;
+            justify-content: center;
+            list-style: none;
+            gap: 30px;
+        }
+
+        nav a {
+            color: var(--ocean-light);
+            text-decoration: none;
+            font-weight: 500;
+            transition: 0.3s;
+            cursor: pointer;
+        }
+
+        nav a:hover {
+            color: var(--sand);
+            text-shadow: 0 0 10px var(--ocean-light);
+        }
+
+        /* Section Styling */
+        section {
+            min-height: 100vh;
+            display: none; /* ซ่อนหน้าอื่นๆ ไว้ก่อน */
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 80px 20px;
+            text-align: center;
+            animation: fadeIn 0.8s ease-in-out;
+        }
+
+        section.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 1.5rem;
+            color: var(--ocean-light);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        p {
+            max-width: 600px;
+            line-height: 1.6;
+            margin-bottom: 2rem;
+            color: #ccc;
+        }
+
+        /* AI Section Styling */
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 2rem;
+            border-radius: 20px;
+            border: 1px solid var(--ocean-mid);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+            backdrop-filter: blur(5px);
+            width: 100%;
+            max-width: 500px;
+        }
+
+        button {
+            background: var(--ocean-mid);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 50px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.3s;
+            margin: 10px;
+        }
+
+        button:hover {
+            background: var(--ocean-light);
+            color: var(--ocean-dark);
+            transform: scale(1.05);
+        }
+
+        #uploadedImage {
+            margin-top: 20px;
+            border-radius: 15px;
+            border: 3px solid var(--ocean-light);
+            object-fit: cover;
+            display: none; /* ซ่อนจนกว่าจะมีการอัปโหลด */
+        }
+
+        #label-container {
+            margin-top: 20px;
+            font-size: 1.2rem;
+        }
+
+        #label-container div {
+            background: rgba(148, 210, 189, 0.2);
+            margin: 5px 0;
+            padding: 8px;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <ul>
+            <li><a onclick="showPage('home')">Home</a></li>
+            <li><a onclick="showPage('check')">Check</a></li>
+            <li><a onclick="showPage('about')">About Us</a></li>
+        </ul>
+    </nav>
+
+    <section id="home" class="active">
+        <h1>Ocean Guardian</h1>
+        <p>ยินดีต้อนรับสู่โลกแห่งมหาสมุทร เราใช้พลังของ AI ในการจำแนกภาพสิ่งมีชีวิตหรือวัตถุใต้ท้องทะเล เพื่อช่วยปกป้องระบบนิเวศของเรา</p>
+        <button onclick="showPage('check')">เริ่มต้นใช้งาน</button>
+    </section>
+
+    <section id="check">
+        <h1>AI Classification</h1>
+        <div class="card">
+            <p>กรุณากด Load Model ก่อนเริ่มใช้งานครั้งแรก</p>
+            <button type="button" onclick="init()">1. Load Model</button>
+            <br><br>
+            <input type="file" id="imageUpload" accept="image/*" onchange="loadImage(event)" style="margin-bottom: 20px;">
+            <br>
+            <img id="uploadedImage" width="250" height="250" src="#">
+            <div id="label-container"></div>
+        </div>
+    </section>
+
+    <section id="about">
+        <h1>About Us</h1>
+        <p>เราคือทีมงานที่รักในทะเล Code นี้ถูกสร้างขึ้นเพื่อเป็นตัวอย่างการผสมผสานระหว่างดีไซน์ Modern Ocean และเทคโนโลยี Machine Learning ผ่าน Teachable Machine</p>
+        <div style="color: var(--ocean-light);">Created with ❤️ for Ocean Lovers</div>
+    </section>
+
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@latest/dist/teachablemachine-image.min.js"></script>
+
+    <script type="text/javascript">
+        // Page Navigation Logic
+        function showPage(pageId) {
+            document.querySelectorAll('section').forEach(section => {
+                section.classList.remove('active');
+            });
+            document.getElementById(pageId).classList.add('active');
+        }
+
+        // Teachable Machine Logic
+        const URL = "https://teachablemachine.withgoogle.com/models/tlLcmo6pv/";
+        let model, labelContainer, maxPredictions;
+
+        async function init() {
+            const modelURL = URL + "model.json";
+            const metadataURL = URL + "metadata.json";
+            try {
+                model = await tmImage.load(modelURL, metadataURL);
+                maxPredictions = model.getTotalClasses();
+                labelContainer = document.getElementById("label-container");
+                labelContainer.innerHTML = "";
+                for (let i = 0; i < maxPredictions; i++) {
+                    labelContainer.appendChild(document.createElement("div"));
+                }
+                alert("โหลดโมเดลสำเร็จแล้ว! พร้อมวิเคราะห์ภาพ");
+            } catch (e) {
+                alert("เกิดข้อผิดพลาดในการโหลดโมเดล");
+            }
+        }
+
+        function loadImage(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = document.getElementById("uploadedImage");
+                img.src = e.target.result;
+                img.style.display = "inline-block";
+                img.onload = function() {
+                    predict();
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+
+        async function predict() {
+            if (!model) {
+                alert("กรุณากด Load Model ก่อนครับ");
+                return;
+            }
+            const img = document.getElementById("uploadedImage");
+            const prediction = await model.predict(img);
+            for (let i = 0; i < maxPredictions; i++) {
+                const classPrediction =
+                    prediction[i].className + ": " + (prediction[i].probability * 100).toFixed(2) + "%";
+                labelContainer.childNodes[i].innerHTML = classPrediction;
+            }
+        }
+    </script>
+</body>
+</html>
